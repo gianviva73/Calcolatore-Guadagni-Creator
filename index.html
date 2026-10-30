@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Guadagni Creator - Digital Creator Lab</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            cyan: '#06b6d4',
+                            orange: '#f97316',
+                            green: '#10b981',
+                            purple: '#a855f7',
+                            dark: '#080c14',
+                            card: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            background-color: #080c14;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-highlight {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(249, 115, 22, 0.12) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        input[type="number"], input[type="range"], select {
+            background-color: rgba(8, 12, 20, 0.9) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+        }
+
+        input[type="number"]:focus {
+            border-color: #06b6d4 !important;
+            outline: none !important;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3) !important;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080c14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+    <!-- Header Sticky -->
+    <header class="border-b border-gray-800/80 bg-gray-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-orange-500 flex items-center justify-center font-extrabold text-black text-lg shadow-lg shadow-cyan-500/20">
+                    DCL
+                </div>
+                <div>
+                    <h1 class="text-base font-extrabold text-white tracking-wide leading-tight">Digital Creator Lab</h1>
+                    <p class="text-xs text-cyan-400 font-medium" id="ui-subtitle">Calcolatore Guadagni Creator</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Selettore Lingua -->
+                <select id="lang-select" onchange="changeLang(this.value)" class="text-xs font-bold px-2.5 py-1.5 rounded-lg border border-cyan-500/30 text-cyan-400 bg-gray-900 cursor-pointer">
+                    <option value="it">🇮🇹 IT</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="es">🇪🇸 ES</option>
+                    <option value="fr">🇫🇷 FR</option>
+                </select>
+
+                <!-- Pulsante Guida Utente -->
+                <button onclick="toggleGuide()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/15 border border-orange-500/40 text-orange-300 text-xs font-bold hover:bg-orange-500/30 transition-all cursor-pointer">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span id="ui-btn-guide">Guida</span>
+                </button>
+
+                <!-- Canale WhatsApp -->
+                <a href="https://whatsapp.com/channel/0029Vb8tqXaB4hdRxxjPkp3C" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-bold hover:bg-emerald-500/30 transition-all">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <span id="ui-btn-wa">Canale</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
+
+        <!-- Modal / Box Guida Utente -->
+        <section id="guide-box" class="hidden glass-card rounded-2xl p-5 border-cyan-500/40 shadow-2xl relative">
+            <button onclick="toggleGuide()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h2 class="text-sm font-bold text-cyan-400 flex items-center gap-2 mb-3">
+                <i class="fa-solid fa-lightbulb"></i> <span id="g-title">Come funziona la stima dei guadagni?</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-300">
+                <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+                    <div class="font-bold text-white mb-1" id="g-step1-t">1. Visualizzazioni & CPM</div>
+                    <p id="g-step1-d">I guadagni da fondi creator e pubblicità dipendono dal CPM (quanto la piattaforma paga ogni 1.000 visualizzazioni).</p>
+                </div>
+                <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+                    <div class="font-bold text-orange-400 mb-1" id="g-step2-t">2. Sponsorizzazioni</div>
+                    <p id="g-step2-d">Inserisci il compenso medio che chiedi a un brand per singolo contenuto e quanti ne pubblichi al mese.</p>
+                </div>
+                <div class="bg-gray-900/80 p-3 rounded-xl border border-gray-800">
+                    <div class="font-bold text-emerald-400 mb-1" id="g-step3-t">3. Vendite Dirette</div>
+                    <p id="g-step3-d">Calcola le entrate derivanti da link affiliati, infoprodotti, preset, guide o consulenze private.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD RISULTATI TOTALE (HIGHLIGHT) -->
+        <section class="glass-highlight rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-gray-700/50 pb-5 mb-5">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 block mb-1" id="ui-res-label">Stima Guadagno Mensile Totale</span>
+                    <div class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" id="total-monthly">€ 0.00</div>
+                </div>
+                <div class="sm:text-right bg-gray-950/60 p-3 sm:p-4 rounded-xl border border-gray-800">
+                    <span class="text-xs text-gray-400 block mb-1" id="ui-ann-label">Proiezione Annuale</span>
+                    <span class="text-xl sm:text-2xl font-bold text-emerald-400" id="total-yearly">€ 0.00</span>
+                </div>
+            </div>
+
+            <!-- Breakdown rapido -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800">
+                    <span class="text-gray-400 block mb-1" id="ui-b1">Fondo / Ads</span>
+                    <span class="font-bold text-cyan-300 text-sm" id="breakdown-ads">€ 0.00</span>
+                </div>
+                <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800">
+                    <span class="text-gray-400 block mb-1" id="ui-b2">Sponsorizzazioni</span>
+                    <span class="font-bold text-orange-300 text-sm" id="breakdown-sponsors">€ 0.00</span>
+                </div>
+                <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800">
+                    <span class="text-gray-400 block mb-1" id="ui-b3">Vendite / Affiliazioni</span>
+                    <span class="font-bold text-emerald-300 text-sm" id="breakdown-sales">€ 0.00</span>
+                </div>
+                <div class="bg-gray-950/60 p-3 rounded-xl border border-gray-800">
+                    <span class="text-gray-400 block mb-1" id="ui-b4">RPM Reale (per 1k Views)</span>
+                    <span class="font-bold text-purple-300 text-sm" id="effective-rpm">€ 0.00</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEZIONE INPUT E PARAMETRI -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            <!-- 1. Views & Piattaforme -->
+            <section class="glass-card rounded-2xl p-5 space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+                    <i class="fa-solid fa-eye text-sm"></i> <span id="ui-sec1-title">1. Traffico Mensile</span>
+                </h3>
+
+                <div>
+                    <label class="block text-xs text-gray-300 font-semibold mb-1" id="ui-label-views">Visualizzazioni Totali / Mese</label>
+                    <input type="number" id="monthly-views" value="250000" step="5000" min="0" oninput="calculateEarnings()" class="w-full px-3 py-2 rounded-xl text-sm font-bold">
+                    <p class="text-[11px] text-gray-400 mt-1" id="ui-sub-views">Somma di TikTok, Reels, Shorts e Video</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-300 font-semibold mb-1" id="ui-label-cpm">CPM Medio Stimato (€)</label>
+                    <input type="number" id="cpm-rate" value="0.40" step="0.05" min="0" oninput="calculateEarnings()" class="w-full px-3 py-2 rounded-xl text-sm font-bold">
+                    <p class="text-[11px] text-gray-400 mt-1" id="ui-sub-cpm">Media: TikTok ~0.20€ - 0.50€ | YouTube ~1.50€ - 4.00€</p>
+                </div>
+            </section>
+
+            <!-- 2. Brand Deals & Sponsor -->
+            <section class="glass-card rounded-2xl p-5 space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-2">
+                    <i class="fa-solid fa-handshake text-sm"></i> <span id="ui-sec2-title">2. Sponsorizzazioni</span>
+                </h3>
+
+                <div>
+                    <label class="block text-xs text-gray-300 font-semibold mb-1" id="ui-label-spons-count">Post / Video Sponsorizzati al Mese</label>
+                    <input type="number" id="spons-count" value="2" min="0" oninput="calculateEarnings()" class="w-full px-3 py-2 rounded-xl text-sm font-bold">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-300 font-semibold mb-1" id="ui-label-spons-rate">Compenso Medio per Post (€)</label>
+                    <input type="number" id="spons-rate" value="200" step="10" min="0" oninput="calculateEarnings()" class="w-full px-3 py-2 rounded-xl text-sm font-bold">
+                    <p class="text-[11px] text-gray-400 mt-1" id="ui-sub-spons">Tariffa media concordata con i brand</p>
+                </div>
+            </section>
+
+            <!-- 3. Prodotti & Affiliazioni -->
+            <section class="glass-card rounded-2xl p-5 space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                    <i class="fa-solid fa-basket-shopping text-sm"></i> <span id="ui-sec3-title">3. Vendite Dirette & Affiliati</span>
+                </h3>
+
+                <div>
+                    <label class="block text-xs text-gray-300 font-semibold mb-1" id="ui-label-sales-count">Numero di Vendite / Mese</label>
+                    <input type="number" id="sales-count" value="15" min="0" oninput="calculateEarnings()" class="w-full px-3 py-2 rounded-xl text-sm font-bold">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-300 font-semibold mb-1" id="ui-label-sales-profit">Profitto Medio per Vendita (€)</label>
+                    <input type="number" id="sales-profit" value="25" step="5" min="0" oninput="calculateEarnings()" class="w-full px-3 py-2 rounded-xl text-sm font-bold">
+                    <p class="text-[11px] text-gray-400 mt-1" id="ui-sub-sales">Guadagno netto o commissione per ogni vendita</p>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-8 border-t border-gray-800/60 py-4 text-center text-xs text-gray-500">
+        Digital Creator Lab © 2026 • Strumenti gratuiti per Creator
+    </footer>
+
+    <script>
+        let currentLang = 'it';
+
+        const i18n = {
+            it: {
+                subtitle: "Calcolatore Guadagni Creator",
+                btnGuide: "Guida",
+                btnWa: "Canale",
+                gTitle: "Come funziona la stima dei guadagni?",
+                gStep1T: "1. Visualizzazioni & CPM",
+                gStep1D: "I guadagni da fondi creator e pubblicità dipendono dal CPM (quanto la piattaforma paga ogni 1.000 visualizzazioni).",
+                gStep2T: "2. Sponsorizzazioni",
+                gStep2D: "Inserisci il compenso medio che chiedi a un brand per singolo contenuto e quanti ne pubblichi al mese.",
+                gStep3T: "3. Vendite Dirette",
+                gStep3D: "Calcola le entrate derivanti da link affiliati, infoprodotti, preset, guide o consulenze private.",
+                resLabel: "Stima Guadagno Mensile Totale",
+                annLabel: "Proiezione Annuale",
+                b1: "Fondo / Ads",
+                b2: "Sponsorizzazioni",
+                b3: "Vendite / Affiliazioni",
+                b4: "RPM Reale (per 1k Views)",
+                sec1Title: "1. Traffico Mensile",
+                labelViews: "Visualizzazioni Totali / Mese",
+                subViews: "Somma di TikTok, Reels, Shorts e Video",
+                labelCpm: "CPM Medio Stimato (€)",
+                subCpm: "Media: TikTok ~0.20€ - 0.50€ | YouTube ~1.50€ - 4.00€",
+                sec2Title: "2. Sponsorizzazioni",
+                labelSponsCount: "Post / Video Sponsorizzati al Mese",
+                labelSponsRate: "Compenso Medio per Post (€)",
+                subSpons: "Tariffa media concordata con i brand",
+                sec3Title: "3. Vendite Dirette & Affiliati",
+                labelSalesCount: "Numero di Vendite / Mese",
+                labelSalesProfit: "Profitto Medio per Vendita (€)",
+                subSales: "Guadagno netto o commissione per ogni vendita"
+            },
+            en: {
+                subtitle: "Creator Earnings Calculator",
+                btnGuide: "Guide",
+                btnWa: "Channel",
+                gTitle: "How does earnings estimation work?",
+                gStep1T: "1. Views & CPM",
+                gStep1D: "Earnings from creator funds and ads depend on CPM (what platforms pay per 1,000 views).",
+                gStep2T: "2. Sponsorships",
+                gStep2D: "Enter the average rate you charge a brand per post and how many you publish per month.",
+                gStep3T: "3. Direct Sales",
+                gStep3D: "Calculate revenues from affiliate links, digital products, presets, guides or consulting.",
+                resLabel: "Total Monthly Estimated Revenue",
+                annLabel: "Yearly Projection",
+                b1: "Fund / Ads",
+                b2: "Sponsorships",
+                b3: "Sales / Affiliates",
+                b4: "Effective RPM (per 1k Views)",
+                sec1Title: "1. Monthly Traffic",
+                labelViews: "Total Views / Month",
+                subViews: "Sum of TikTok, Reels, Shorts and Videos",
+                labelCpm: "Estimated Average CPM (€)",
+                subCpm: "Average: TikTok ~0.20€ - 0.50€ | YouTube ~1.50€ - 4.00€",
+                sec2Title: "2. Sponsorships",
+                labelSponsCount: "Sponsored Posts / Videos per Month",
+                labelSponsRate: "Average Rate per Post (€)",
+                subSpons: "Average rate agreed with brands",
+                sec3Title: "3. Direct Sales & Affiliates",
+                labelSalesCount: "Number of Sales / Month",
+                labelSalesProfit: "Average Profit per Sale (€)",
+                subSales: "Net profit or commission per sale"
+            },
+            es: {
+                subtitle: "Calculadora de Ingresos Creador",
+                btnGuide: "Guía",
+                btnWa: "Canal",
+                gTitle: "¿Cómo funciona la estimación de ingresos?",
+                gStep1T: "1. Visualizaciones y CPM",
+                gStep1D: "Los ingresos del fondo de creadores y anuncios dependen del CPM (pago por cada 1.000 vistas).",
+                gStep2T: "2. Patrocinios",
+                gStep2D: "Introduce la tarifa media que cobras a las marcas por contenido y cuántos publicas al mes.",
+                gStep3T: "3. Ventas Directas",
+                gStep3D: "Calcula ingresos por enlaces de afiliados, infoproductos, guías o consultorías.",
+                resLabel: "Ingresos Mensuales Estimados Totales",
+                annLabel: "Proyección Anual",
+                b1: "Fondo / Anuncios",
+                b2: "Patrocinios",
+                b3: "Ventas / Afiliados",
+                b4: "RPM Real (por 1k Vistas)",
+                sec1Title: "1. Tráfico Mensual",
+                labelViews: "Visualizaciones Totales / Mes",
+                subViews: "Suma de TikTok, Reels, Shorts y Videos",
+                labelCpm: "CPM Medio Estimado (€)",
+                subCpm: "Media: TikTok ~0.20€ - 0.50€ | YouTube ~1.50€ - 4.00€",
+                sec2Title: "2. Patrocinios",
+                labelSponsCount: "Posts Patrocinados / Mes",
+                labelSponsRate: "Tarifa Media por Post (€)",
+                subSpons: "Tarifa media acordada con marcas",
+                sec3Title: "3. Ventas Directas y Afiliados",
+                labelSalesCount: "Número de Ventas / Mes",
+                labelSalesProfit: "Beneficio Medio por Venta (€)",
+                subSales: "Ganancia neta o comisión por venta"
+            },
+            fr: {
+                subtitle: "Calculateur de Revenus Créateur",
+                btnGuide: "Guide",
+                btnWa: "Chaîne",
+                gTitle: "Comment fonctionne l'estimation des revenus ?",
+                gStep1T: "1. Vues & CPM",
+                gStep1D: "Les revenus des fonds créateurs et pubs dépendent du CPM (paiement pour 1 000 vues).",
+                gStep2T: "2. Sponsoring",
+                gStep2D: "Saisissez le tarif moyen facturé aux marques par contenu et le nombre par mois.",
+                gStep3T: "3. Ventes Directes",
+                gStep3D: "Calculez les revenus issus de l'affiliation, des infoproduits, guides ou coaching.",
+                resLabel: "Revenu Mensuel Total Estimé",
+                annLabel: "Projection Annuelle",
+                b1: "Fonds / Pubs",
+                b2: "Sponsoring",
+                b3: "Ventes / Affiliations",
+                b4: "RPM Effectif (pour 1k Vues)",
+                sec1Title: "1. Trafic Mensuel",
+                labelViews: "Vues Totales / Mois",
+                subViews: "Somme de TikTok, Reels, Shorts et Vidéos",
+                labelCpm: "CPM Moyen Estimé (€)",
+                subCpm: "Moyenne : TikTok ~0.20€ - 0.50€ | YouTube ~1.50€ - 4.00€",
+                sec2Title: "2. Sponsoring",
+                labelSponsCount: "Posts Sponsorisés / Mois",
+                labelSponsRate: "Tarif Moyen par Post (€)",
+                subSpons: "Tarif moyen convenu avec les marques",
+                sec3Title: "3. Ventes Directes & Affiliés",
+                labelSalesCount: "Nombre de Ventes / Mois",
+                labelSalesProfit: "Profit Moyen par Vente (€)",
+                subSales: "Gain net ou commission par vente"
+            }
+        };
+
+        window.onload = function() {
+            calculateEarnings();
+        };
+
+        function toggleGuide() {
+            document.getElementById('guide-box').classList.toggle('hidden');
+        }
+
+        function changeLang(lang) {
+            currentLang = lang;
+            const t = i18n[lang];
+
+            document.getElementById('ui-subtitle').innerText = t.subtitle;
+            document.getElementById('ui-btn-guide').innerText = t.btnGuide;
+            document.getElementById('ui-btn-wa').innerText = t.btnWa;
+            document.getElementById('g-title').innerText = t.gTitle;
+            document.getElementById('g-step1-t').innerText = t.gStep1T;
+            document.getElementById('g-step1-d').innerText = t.gStep1D;
+            document.getElementById('g-step2-t').innerText = t.gStep2T;
+            document.getElementById('g-step2-d').innerText = t.gStep2D;
+            document.getElementById('g-step3-t').innerText = t.gStep3T;
+            document.getElementById('g-step3-d').innerText = t.gStep3D;
+            document.getElementById('ui-res-label').innerText = t.resLabel;
+            document.getElementById('ui-ann-label').innerText = t.annLabel;
+            document.getElementById('ui-b1').innerText = t.b1;
+            document.getElementById('ui-b2').innerText = t.b2;
+            document.getElementById('ui-b3').innerText = t.b3;
+            document.getElementById('ui-b4').innerText = t.b4;
+            document.getElementById('ui-sec1-title').innerText = t.sec1Title;
+            document.getElementById('ui-label-views').innerText = t.labelViews;
+            document.getElementById('ui-sub-views').innerText = t.subViews;
+            document.getElementById('ui-label-cpm').innerText = t.labelCpm;
+            document.getElementById('ui-sub-cpm').innerText = t.subCpm;
+            document.getElementById('ui-sec2-title').innerText = t.sec2Title;
+            document.getElementById('ui-label-spons-count').innerText = t.labelSponsCount;
+            document.getElementById('ui-label-spons-rate').innerText = t.labelSponsRate;
+            document.getElementById('ui-sub-spons').innerText = t.subSpons;
+            document.getElementById('ui-sec3-title').innerText = t.sec3Title;
+            document.getElementById('ui-label-sales-count').innerText = t.labelSalesCount;
+            document.getElementById('ui-label-sales-profit').innerText = t.labelSalesProfit;
+            document.getElementById('ui-sub-sales').innerText = t.subSales;
+
+            calculateEarnings();
+        }
+
+        function calculateEarnings() {
+            const views = Math.max(0, parseFloat(document.getElementById('monthly-views').value) || 0);
+            const cpm = Math.max(0, parseFloat(document.getElementById('cpm-rate').value) || 0);
+
+            const sponsCount = Math.max(0, parseFloat(document.getElementById('spons-count').value) || 0);
+            const sponsRate = Math.max(0, parseFloat(document.getElementById('spons-rate').value) || 0);
+
+            const salesCount = Math.max(0, parseFloat(document.getElementById('sales-count').value) || 0);
+            const salesProfit = Math.max(0, parseFloat(document.getElementById('sales-profit').value) || 0);
+
+            // Calcoli
+            const adsEarnings = (views / 1000) * cpm;
+            const sponsEarnings = sponsCount * sponsRate;
+            const salesEarnings = salesCount * salesProfit;
+
+            const totalMonthly = adsEarnings + sponsEarnings + salesEarnings;
+            const totalYearly = totalMonthly * 12;
+
+            const effectiveRpm = views > 0 ? (totalMonthly / (views / 1000)) : 0;
+
+            // Aggiornamento UI
+            document.getElementById('total-monthly').innerText = `€ ${totalMonthly.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('total-yearly').innerText = `€ ${totalYearly.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            document.getElementById('breakdown-ads').innerText = `€ ${adsEarnings.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('breakdown-sponsors').innerText = `€ ${sponsEarnings.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('breakdown-sales').innerText = `€ ${salesEarnings.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('effective-rpm').innerText = `€ ${effectiveRpm.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
